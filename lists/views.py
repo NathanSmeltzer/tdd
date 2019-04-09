@@ -9,3 +9,11 @@ def home_page(request):
         return redirect('/')
     items = Item.objects.all()
     return render(request, 'home.html', {'items':items})
+
+# def list(request):
+#
+
+# def create_list(request):
+#
+#
+# def add_item(request):

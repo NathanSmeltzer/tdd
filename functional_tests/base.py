@@ -8,7 +8,7 @@ from time import sleep
 import unittest, os
 from unittest import skip
 
-MAX_WAIT = 10
+MAX_WAIT = 6
 
 class FunctionalTest(StaticLiveServerTestCase):
     def setUp(self):
@@ -28,6 +28,16 @@ class FunctionalTest(StaticLiveServerTestCase):
                 rows = table.find_elements_by_tag_name('tr')
                 self.assertIn(row_text, [row.text for row in rows])
                 return
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
+
+    def wait_for(self, fn):
+        start_time = time.time()
+        while True:
+            try:
+                return fn()
             except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
                     raise e

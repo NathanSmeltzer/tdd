@@ -29,6 +29,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'tdd.setcurve.com',
     '144.202.0.102',
+    'localhost',
 ]
 
 

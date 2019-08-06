@@ -14,7 +14,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Chrome() #changing from firefox due to permission error
         #staging_server = os.environ.get('STAGING_SERVER')
-        staging_server = 'localhost:8001'
+        staging_server = os.environ.get('STAGING_SERVER')
         if staging_server:
             self.live_server_url = 'http://'+staging_server
 

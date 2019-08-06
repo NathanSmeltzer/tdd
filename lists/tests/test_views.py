@@ -5,11 +5,15 @@ from django.template.loader import render_to_string
 from lists.models import Item, List
 
 from lists.views import home_page
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR, ExistingListItemForm, DUPLICATE_ITEM_ERROR
 
 from django.utils.html import escape
 
 from unittest import skip
+
+#for testing static files
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles import finders
 
 class HomePageTest(TestCase):
 
@@ -20,6 +24,11 @@ class HomePageTest(TestCase):
     def test_home_page_uses_item_form(self):
         response = self.client.get('/')
         self.assertIsInstance(response.context['form'], ItemForm)
+    @skip
+    def test_client_sanity(self): #sanity test comparing django-products error
+        #response = c.get('launcher/price-discrepancy')
+        response = self.client.get('/')
+        self.assertEqual(response.status_code,200)
 
 class NewListTest(TestCase):
     def test_can_save_a_POST_request(self):
@@ -104,7 +113,7 @@ class ListViewTest(TestCase):
     def test_displays_item_form(self):
         list_ = List.objects.create()
         response = self.client.get(f'/lists/{list_.id}/')
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
         self.assertContains(response, 'name="text"')
 
     def post_invalid_input(self):
@@ -126,20 +135,19 @@ class ListViewTest(TestCase):
     def test_for_invalid_input_passes_form_to_template(self):
         response = self.post_invalid_input()
         self.assertEqual(response.status_code,200)
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
 
     def test_for_invalid_input_shows_error_on_page(self):
         response = self.post_invalid_input()
         self.assertContains(response, escape(EMPTY_ITEM_ERROR))
 
-    @skip
     def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
         list1 = List.objects.create()
         item1 = Item.objects.create(list=list1, text='textkey')
         response = self.client.post(
             f'/lists/{list1.id}/', data = {'text':'textkey'}
         )
-        expected_error = escape("You've already got this in your list")
+        expected_error = escape(DUPLICATE_ITEM_ERROR)
         self.assertTemplateUsed(response,'list.html')
         self.assertContains(response, expected_error)
         self.assertEqual(Item.objects.all().count(),1)

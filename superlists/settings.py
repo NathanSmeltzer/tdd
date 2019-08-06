@@ -25,7 +25,10 @@ SECRET_KEY = '^f)5fk^j3bgx8t&t@o39&e7-0gsn9ja67fiv9qsm&*e16+q=o3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'tdd.setcurve.com',
+]
 
 
 # Application definition
